@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="bower_components/angularjs-slider/dist/rzslider.min.css" media="screen">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <!--  Initialisation de l'Application (Module) -->
+  <body ng-app="myApp">
+
+    <div ng-controller="myController">
+      <h3> {{ nom }} {{ prenom }}</h3>
+        <a ng-click="modifierPrenom()">Modifies mon prénom et appel le Donald</a>
+      <p>
+        {{ nom }}
+      </p>
+      <!--
+            ng-model: c'est une directive qui permet d'interagir
+            avec des variables dans la Scope
+       -->
+      <input class="form-control" type="text"
+       ng-model="nom" name="name">
+
+      <input type="text"
+       ng-model="prenom" name="prenom" value="">
+
+       <div ng-class="classBase">
+         <label for="" class="control-label">Salaire</label>
+         <input  ng-keyup="changeClass()" class="form-control" type="text" name="name" ng-model="salaire" value="" >
+      </div>
+
+      <div>
+        <label for="franc">Conversion en Franc (Fr)</label>
+        <input ng-change="convertirFranc()" id="franc" type="checkbox" ng-model="franc">
+        <p ng-if="franc == true">{{ salaireFranc }}</p>
+      </div>
+      <label>Imposition</label>
+      <input type="text" ng-model="impot" ng-blur="net()" placeholder="Imposition en %" value="">
+
+      <div>
+          <!--<rzslider rz-slider-options="{floor: 0, ceil: 450}" rz-slider-model="impot"></rzslider>-->
+          <label>Augmentation</label>
+          <input ng-change="augmentationImposition()" type="range" min="1" max="10" ng-model="augmImpot" value="">
+
+      </div>
+
+      <div class="">
+          <label for="taux">Taux d'imposition</label>
+          <select ng-model="taux" ng-change="changeTaux()" id="taux" class="form-control">
+              <option value="10">10%</option>
+              <option value="20">20%</option>
+              <option value="30">30%</option>
+              <option value="50">50%</option>
+              <option value="75">75%</option>
+          </select>
+      </div>
+
+      <label for="email">EMail</label>
+      <input type="text" id="email" ng-model="email" ng-blur="checkemail()"  value="">
+      <p ng-if="isEmailInValid == true">Attention votre email est invalide</p>
+
+
+      <div ng-if="prenom === nom" class="alert alert-danger">Lde nom doit etre différente du prénom</div>
+
+      <div ng-if="salaire > 1000000 && nom == 'Trump'" class="alert alert-success">
+        Vous etes président
+      </div>
+
+      <div  ng-if="nom.length > 20">Votre nom est trop long!</div>
+
+      <button type="button" ng-click="visibleDetail = true" name="button">Voir Détail</button>
+
+      <button type="button" ng-click="formattage()" name="button">Reformater</button>
+
+      <div class="jumbotron" ng-if="visibleDetail && salaire > 1000">
+          <h4> Voir le détail {{ nom }} {{ salaire }}</h4>
+      </div>
+
+    </div>
+
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+
+    <script src="bower_components/angularjs-slider/dist/rzslider.min.js" charset="utf-8"></script>
+
+
+            <!-- Script  -->
+    <script src="js/main.js" charset="utf-8"></script>
+
+  </body>
+</html>

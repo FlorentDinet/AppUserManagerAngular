@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Angular1</title>
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+    <!-- BOOTSTRAP -->
+    <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <link type="text/css" rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" media="screen,projection" />
+    <!-- ANGULAR -->
+    <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+    <!-- ANGULAR SLIDER -->
+    <link rel="stylesheet" type="text/css" href="bower_components/angularjs-slider/dist/rzslider.min.css" />
+    <script src="bower_components/angularjs-slider/dist/rzslider.min.js"></script>
+    <!-- MON SCRIPT -->
+    <script type="text/javascript" src="js/main.js"></script>
+    <!-- MON CSS -->
+    <link type="text/css" rel="stylesheet" href="dist/css/main.min.css" />
+</head>
+
+<body ng-app="myApp">
+
+    <div ng-controller="myController" class="container">
+        <!--
+      ng-model: c'est une directive qui permet d'interagir avec des variables dans la Scope
+      -->
+        <div class="row">
+            <div class="col-md-12">
+                <h3>{{nom}} {{prenom}}</h3>
+                <form>
+                    <div class="form-group">
+                        <label>Votre nom</label>
+                        <input class="form-control" ng-blur="testEqu()" ng-model="nom" type="text" />
+                    </div>
+                    <div class="form-group">
+                        <label>Votre email</label>
+                        <input class="form-control" ng-blur="testEmail()" ng-model="email" type="text" />
+                    </div>
+                    <div ng-if="!emailIsValid" class="alert alert-warning">
+                        <strong>Warning!</strong> Votre email n'est pas valide
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" ng-class="salaireState" ng-keyup="testSalaire()" ng-blur="testEqu();convertFrancs()" ng-model="salaire" type="text" />
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-click="convertFrancs()" ng-model="checked" ng-init="checked=false">Convertir en francs
+                          </label>
+                        </div>
+                        <p class="help-block animate-if" ng-if="checked">Salaire en francs : {{salaireFrancs}}</p>
+
+
+                    </div>
+                    <div class="form-group">
+                        <label>Imposition</label>
+                        <input class="form-control" ng-keyup="calcSalaire()" ng-model="impositionSlider.value" type="text" />
+                    </div>
+                    <div class="form-group">
+                        <label>Imposition</label>
+                        <rzslider rz-slider-model="impositionSlider.value" rz-slider-options="impositionSlider.options"></rzslider>
+                    </div>
+                    <div class="form-group">
+                        <select ng-change="calcSalaire()" ng-model="impositionSlider.value" class="form-control">
+                          <option value="10">Imposition à 10%</option>
+                          <option value="20">Imposition à 20%</option>
+                          <option value="30">Imposition à 30%</option>
+                          <option value="50">Imposition à 50%</option>
+                          <option value="75">Imposition à 75%</option>
+                        </select>
+                    </div>
+                    <div ng-if="nom.length>20">Votre nom est trop long</div>
+
+                    <button class="btn btn-default" ng-click="modifierPrenom()">Modifier le prénom</button>
+
+                    <button class="btn btn-default" ng-click="reformater()">Re-formater</button>
+                    <button class="btn btn-default" ng-click="isShown = !isShown">Voir le détail</button>
+
+                    <div ng-if="salaire>1000000 && nom == 'Trump'" class="alert alert-success">
+                        <strong>Success!</strong> Vous êtes président
+                    </div>
+
+                    <div ng-if="isEqu" class="alert alert-warning">
+                        <strong>Warning!</strong> Vote Nom doit être différent de votre Prénom
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div ng-show="isShown" class="container">
+                <div class="jumbotron">
+                    <h1>{{nom}} {{prenom}}</h1>
+                    <p>
+                        <strong>Salaire :</strong> {{salaire}}
+                    </p>
+                    <p>
+                        <strong>Salaire net :</strong> {{salaireNet}}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</body>
+
+</html>

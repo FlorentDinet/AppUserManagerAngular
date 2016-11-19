@@ -1,0 +1,23 @@
+{
+  "name": "angular1",
+  "homepage": "https://github.com/FlorentDinet/3WA",
+  "authors": [
+    "flodi <florent@flodi.fr>"
+  ],
+  "description": "",
+  "main": "index.html",
+  "license": "none",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.1.1",
+    "angular": "^1.5.8",
+    "angularjs-slider": "^5.8.7"
+  }
+}
