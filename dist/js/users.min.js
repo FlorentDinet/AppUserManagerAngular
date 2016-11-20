@@ -3,13 +3,13 @@
     "use strict";
 
     // permet d'initialiser une app coté JS
-    angular.module('appUsers', [])
+    angular.module('appUsers', ['lumx'])
         .controller('UsersCtrl', UsersCtrl)
         .filter('triParAge', function() {
             // In the return function, we must pass in a single parameter which will be the data we will work on.
             // We have the ability to support multiple other parameters that can be passed into the filter optionally
             return function(input, sens) {
-              console.log("cogdgdfucou");
+                console.log("tri en cours");
 
                 // if (tri) {
 
@@ -25,7 +25,7 @@
                 });
 
                 if (sens == "desc") {
-                input.reverse();
+                    input.reverse();
                 }
 
                 // }
@@ -44,8 +44,10 @@
      * Fonction de mon Controlleur
      */
 
-    function UsersCtrl($scope, $http) {
-        console.log('Scope chargé');
+    function UsersCtrl($scope, $http, $filter) {
+
+
+        // console.log('Scope chargé');
         $scope.isavatarUrlValide = true;
         $scope.tri = "";
         $scope.triOptions = [{
@@ -87,6 +89,53 @@
             avatarUrl: 'http://api.adorable.io/avatars/40/brigitte.png',
 
         }];
+        $scope.selectedRows = 0;
+        $scope.dataTableThead = [{
+            name: 'nom',
+            label: 'Nom',
+            sortable: true
+        }, {
+            name: 'prenom',
+            label: 'Prenom',
+            sortable: true
+        }, {
+            name: 'sexe',
+            label: 'Sexe',
+            sortable: true,
+        }, {
+            name: 'age',
+            label: 'Age',
+            sortable: true
+        }, {
+            name: 'ville',
+            label: 'Ville',
+            sortable: true
+        }];
+        $scope.advancedDataTableThead = angular.copy($scope.dataTableThead);
+        $scope.advancedDataTableThead.unshift({
+            name: 'avatarUrl',
+            format: function(row) {
+                return '<img src="' + row.avatarUrl + '" width="40" height="40" class="img-round">';
+            }
+        });
+
+        $scope.$on('lx-data-table__select', updateActions);
+        $scope.$on('lx-data-table__unselect', updateActions);
+        $scope.$on('lx-data-table__sort', updateSort);
+
+        ////////////
+
+        function updateActions(_event, _selectedRows) {
+          console.log(_selectedRows);
+          console.log($scope.selectedRows);
+            $scope.selectedRows = _selectedRows;
+            console.log("-------- selected rows : ------");
+        }
+
+        function updateSort(_event, _column) {
+            console.log(_column);
+            $scope.users = $filter('orderBy')($scope.users, _column.name, _column.sort === 'desc' ? true : false);
+        }
 
         $scope.ajouterUser = function() {
             console.log('formulaire envoyé');
@@ -106,19 +155,49 @@
             $scope.ville = '';
 
         };
-        $scope.supprimerUser = function(nom) {
-            // console.log(nom);
+        $scope.$watch($scope.selectedRows, updateActions);
+        $scope.supprimerUser = function() {
+            // console.log(unwantedRows);
+
+            for (var i = 0; i < $scope.selectedRows.length; i++) {
+              console.log($scope.selectedRows[i]);
+              console.log($scope.users.indexOf($scope.selectedRows[i]));
+              if ($scope.users.indexOf($scope.selectedRows[i]) !== -1){
+                $scope.users.splice($scope.users.indexOf($scope.selectedRows[i]), 1);
+              }
+            }
+            $scope.selectedRows=null;
+
+            selectedRows.unselectAll($scope.users);
+
+            console.log("selectedRows "+ $scope.selectedRows);
+
+
+            // function testSiEgalASelection(element) {
+            //     for (var j = 0; j < unwantedRowsNames.length+1; j++) {
+            //       console.log(unwantedRowsNames);
+            //         console.log(element.nom + " compare à : " + unwantedRowsNames[j]);
+            //         if (element.nom == unwantedRowsNames[j]) {
+            //             return false;
+            //         }
+            //         return true;
+            //     }
+            // }
+            // $scope.users = $scope.users.filter(testSiEgalASelection);
+            // $scope.selectedRows = $scope.selectedRows.filter(testSiEgalASelection);
+
+
             // console.log(users[{nom}]);
             // $scope.users[{nom}.indexOf()].indexOf();
-            function findUserRow(element) {
-                return element.nom === nom;
-            }
-
-            var id = $scope.users.findIndex(findUserRow);
-
-            console.log(id);
-
-            $scope.users.splice(id, 1);
+            // function findUserRow(element) {
+            //     return element.nom === nom;
+            // }
+            //
+            // var id = $scope.users.findIndex(findUserRow);
+            //
+            // console.log(id);
+            //
+            // $scope.users.splice(id, 1);
 
         };
         $scope.validateAvatarUrl = function() {
