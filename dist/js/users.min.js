@@ -3,7 +3,7 @@
     "use strict";
 
     // permet d'initialiser une app coté JS
-    angular.module('appUsers', ['lumx'])
+    angular.module('appUsers', ['rzModule', 'lumx', 'ngMap'])
         .controller('UsersCtrl', UsersCtrl)
         .filter('triParAge', function() {
             // In the return function, we must pass in a single parameter which will be the data we will work on.
@@ -29,10 +29,24 @@
                 }
 
                 // }
-                console.log(input);
+                // console.log(input);
                 return input;
 
             };
+
+        })
+        .filter('onlyAdultFilter', function() {
+            console.log("filter les adultes en cours");
+            return function(input) {
+
+                function suffisammentGrand(element) {
+                    return element.age > 18;
+                }
+                input = input.filter(suffisammentGrand);
+                console.log(input);
+                return input;
+            };
+
 
         });
 
@@ -44,7 +58,55 @@
      * Fonction de mon Controlleur
      */
 
-    function UsersCtrl($scope, $http, $filter) {
+    function UsersCtrl($scope, $http, $filter, LxNotificationService, NgMap) {
+
+        $scope.notify = notify;
+
+        function notify(_type) {
+            if (_type === 'simple') {
+                LxNotificationService.notify('Lorem Ipsum');
+            } else if (_type === 'sticky') {
+                LxNotificationService.notify('Lorem Ipsum', undefined, true);
+            } else if (_type === 'icon') {
+                LxNotificationService.notify('Lorem Ipsum', 'android');
+            } else if (_type === 'color') {
+                LxNotificationService.notify('Lorem Ipsum', 'android', false, 'yellow');
+            } else if (_type === 'info') {
+                LxNotificationService.info('Lorem Ipsum');
+            } else if (_type === 'success') {
+                LxNotificationService.success('Success');
+            } else if (_type === 'warning') {
+                LxNotificationService.warning('Lorem Ipsum');
+            } else if (_type === 'error') {
+                LxNotificationService.error('Lorem Ipsum');
+            }
+        }
+
+        $scope.vars = {
+            nom: '',
+            prenom: '',
+            sexe: '',
+            age: '',
+            ville: '',
+            avatarUrl: ''
+        };
+
+        $scope.onlyAdult = false;
+
+        $scope.howMuchToShow = {
+            value: 10,
+            options: {
+                floor: 0,
+                ceil: 20,
+                showSelectionBar: true,
+                onChange: function(id, value) {
+                    // console.log($scope.users);
+                    // $scope.users = $filter('limitTo')($scope.users, value, 0);
+                    // $scope.imposition = value;
+                    // console.log(value);
+                }
+            }
+        };
 
 
         // console.log('Scope chargé');
@@ -57,38 +119,39 @@
             label: 'Vieux',
             value: "desc"
         }];
-        $scope.users = [{
-            nom: 'Dinet',
-            prenom: 'Florent',
-            sexe: true,
-            age: 70,
-            ville: 'Lyon',
-            avatarUrl: 'http://api.adorable.io/avatars/40/florent.png',
-        }, {
-            nom: 'Gropius',
-            prenom: 'Walter',
-            sexe: true,
-            age: 68,
-            ville: 'Berlin',
-            avatarUrl: 'http://api.adorable.io/avatars/40/Walter.png',
-
-        }, {
-            nom: 'Moholy nagy',
-            prenom: 'wazinsky',
-            sexe: true,
-            age: 56,
-            ville: 'Stains',
-            avatarUrl: 'http://api.adorable.io/avatars/40/wazinsky.png',
-
-        }, {
-            nom: 'Bardot',
-            prenom: 'Brigitte',
-            sexe: false,
-            age: 75,
-            ville: 'Saint-Tropez',
-            avatarUrl: 'http://api.adorable.io/avatars/40/brigitte.png',
-
-        }];
+        $scope.users=[];
+        // $scope.users = [{
+        //     nom: 'Dinet',
+        //     prenom: 'Florent',
+        //     sexe: true,
+        //     age: 7,
+        //     ville: 'Lyon',
+        //     avatarUrl: 'http://api.adorable.io/avatars/40/florent.png',
+        // }, {
+        //     nom: 'Gropius',
+        //     prenom: 'Walter',
+        //     sexe: true,
+        //     age: 68,
+        //     ville: 'Berlin',
+        //     avatarUrl: 'http://api.adorable.io/avatars/40/Walter.png',
+        //
+        // }, {
+        //     nom: 'Moholy nagy',
+        //     prenom: 'wazinsky',
+        //     sexe: true,
+        //     age: 56,
+        //     ville: 'Stains',
+        //     avatarUrl: 'http://api.adorable.io/avatars/40/wazinsky.png',
+        //
+        // }, {
+        //     nom: 'Bardot',
+        //     prenom: 'Brigitte',
+        //     sexe: false,
+        //     age: 75,
+        //     ville: 'Saint-Tropez',
+        //     avatarUrl: 'http://api.adorable.io/avatars/40/brigitte.png',
+        //
+        // }];
         $scope.selectedRows = 0;
         $scope.dataTableThead = [{
             name: 'nom',
@@ -111,6 +174,7 @@
             label: 'Ville',
             sortable: true
         }];
+        $scope.usersUntouched = $scope.users;
         $scope.advancedDataTableThead = angular.copy($scope.dataTableThead);
         $scope.advancedDataTableThead.unshift({
             name: 'avatarUrl',
@@ -126,51 +190,67 @@
         ////////////
 
         function updateActions(_event, _selectedRows) {
-          console.log(_selectedRows);
-          console.log($scope.selectedRows);
+            // console.log(_selectedRows);
+            // console.log($scope.selectedRows);
             $scope.selectedRows = _selectedRows;
-            console.log("-------- selected rows : ------");
+            // console.log("-------- selected rows : ------");
         }
 
         function updateSort(_event, _column) {
-            console.log(_column);
+            // console.log(_column);
             $scope.users = $filter('orderBy')($scope.users, _column.name, _column.sort === 'desc' ? true : false);
+        }
+
+        $scope.$watch('onlyAdult', showOnlyAdult);
+
+        function showOnlyAdult() {
+            // console.log("untouched");
+            // console.log($scope.usersUntouched);
+            // console.log("users");
+            // console.log($scope.users);
+            if ($scope.onlyAdult) {
+                // $scope.usersUntouched = $scope.users;
+                $scope.users = $filter('onlyAdultFilter')($scope.users);
+            } else {
+                // $scope.users = $scope.usersUntouched;
+            }
         }
 
         $scope.ajouterUser = function() {
             console.log('formulaire envoyé');
+            console.log($scope.vars.nom);
             $scope.users.push({
-                nom: $scope.nom,
-                prenom: $scope.prenom,
-                sexe: $scope.sexe,
-                age: $scope.age,
-                ville: $scope.ville,
-                avatarUrl: $scope.avatarUrl
+                nom: $scope.vars.nom,
+                prenom: $scope.vars.prenom,
+                sexe: $scope.vars.sexe,
+                age: $scope.vars.age,
+                ville: $scope.vars.ville,
+                avatarUrl: $scope.vars.avatarUrl
             });
 
-            $scope.nom = '';
+            $scope.vars.nom = '';
             $scope.prenom = '';
             $scope.sexe = '';
             $scope.age = '';
             $scope.ville = '';
 
+            notify('success');
+
         };
-        $scope.$watch($scope.selectedRows, updateActions);
         $scope.supprimerUser = function() {
             // console.log(unwantedRows);
 
             for (var i = 0; i < $scope.selectedRows.length; i++) {
-              console.log($scope.selectedRows[i]);
-              console.log($scope.users.indexOf($scope.selectedRows[i]));
-              if ($scope.users.indexOf($scope.selectedRows[i]) !== -1){
-                $scope.users.splice($scope.users.indexOf($scope.selectedRows[i]), 1);
-              }
+                // console.log($scope.selectedRows[i]);
+                // console.log($scope.users.indexOf($scope.selectedRows[i]));
+                if ($scope.users.indexOf($scope.selectedRows[i]) !== -1) {
+                    $scope.users.splice($scope.users.indexOf($scope.selectedRows[i]), 1);
+                }
             }
-            $scope.selectedRows=null;
+            $scope.selectedRows = null;
 
-            selectedRows.unselectAll($scope.users);
-
-            console.log("selectedRows "+ $scope.selectedRows);
+            // lxDataTable.toggleAllSelected();
+            // console.log("selectedRows " + $scope.selectedRows);
 
 
             // function testSiEgalASelection(element) {
@@ -206,6 +286,12 @@
             console.log($scope.isavatarUrlValide);
         };
 
+        NgMap.getMap().then(function(map) {
+            console.log(map.getCenter());
+            console.log('markers', map.markers);
+            console.log('shapes', map.shapes);
+        });
+
 
         // // Simple GET request example:
         // $http({
@@ -221,10 +307,47 @@
 
         // $http.get('https://randomuser.me/api/', config).then(successCallback, errorCallback);
 
-        $http.get("https://randomuser.me/api/")
+        $http.get("https://randomuser.me/api/?results=20")
             .then(function(response) {
-                $scope.myWelcome = response.data;
-                // console.log($scope.myWelcome);
+                var jsonData = response.data.results;
+                console.log(jsonData);
+
+                for (var i = 0; i < jsonData.length; i++) {
+                    var dob = jsonData[i].dob;
+                    dob = dob.substring(10, 0);
+                    dob = dob.split("-");
+                    dob = dob.join();
+
+                    moment.updateLocale('en', {
+                        relativeTime: {
+                            future: "in %s",
+                            past: "%s ago",
+                            s: "seconds",
+                            m: "a minute",
+                            mm: "%d minutes",
+                            h: "an hour",
+                            hh: "%d hours",
+                            d: "a day",
+                            dd: "%d days",
+                            M: "a month",
+                            MM: "%d months",
+                            y: "a year",
+                            yy: "%d"
+                        }
+                    });
+
+                    var age = moment(dob, "YYYYMMDD").fromNow(true); // 5 years ago
+
+                    $scope.users.push({
+                        nom: jsonData[i].name.first,
+                        prenom: jsonData[i].name.last,
+                        sexe: jsonData[i].gender,
+                        age: age,
+                        ville: jsonData[i].location.city,
+                        avatarUrl: jsonData[i].picture.large,
+                        position: jsonData[i].location.city
+                    });
+                }
             });
 
     }

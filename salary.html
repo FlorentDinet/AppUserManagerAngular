@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Salary</title>
+    <!-- BOOTSTRAP -->
+    <!-- <link type="text/css" rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" media="screen,projection" /> -->
+    <!-- ANGULAR SLIDER -->
+    <link rel="stylesheet" type="text/css" href="bower_components/angularjs-slider/dist/rzslider.min.css" />
+    <!-- MON CSS -->
+    <link type="text/css" rel="stylesheet" href="dist/css/main.min.css" />
+    <!-- LUMX -->
+    <link rel="stylesheet" href="bower_components/lumx/dist/lumx.css">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+</head>
+
+<body ng-app="myApp" class="bgc-deep-purple-800" ng-cloak>
+
+    <div ng-controller="SalaryCtrl" flex-container="row" flex-align="space-around" flex-column="12" class="p+" flex-gutter="24">
+        <!--
+      ng-model: c'est une directive qui permet d'interagir avec des variables dans la Scope
+      -->
+        <div flex-item="8">
+            <div class="card">
+                <div class="p+">
+                    <strong class="fs-headline display-block">{{vars.nom}} {{vars.prenom}}</strong>
+
+                    <lx-text-field lx-label="Nom">
+                        <input ng-model="vars.nom" type="text" ng-blur="testEqu()" />
+                    </lx-text-field>
+                    <div ng-if="isEqu" class="alert alert-warning">
+                        <strong>Warning!</strong> Vote Nom doit être différent de votre Prénom
+                    </div>
+
+                    <div flex-container="row" flex-gutter="24">
+                        <div flex-item>
+                            <lx-text-field lx-label="Email">
+                                <input ng-blur="testEmail()" ng-model="vars.email" type="text" />
+                            </lx-text-field>
+                            <div ng-if="!emailIsValid" class="alert alert-warning">
+                                <strong>Warning!</strong> Votre email n'est pas valide
+                            </div>
+                        </div>
+                        <div flex-item>
+                            <lx-text-field lx-label="Salaire brut">
+                                <input ng-class="salaireState" ng-keyup="testSalaire()" ng-blur="testEqu();convertFrancs()" ng-model="vars.salaire" type="text" />
+                            </lx-text-field>
+
+                            <lx-checkbox ng-click="convertFrancs()" ng-model="checked" ng-init="checked=false" class="mt+">
+                                <lx-checkbox-label>Convertir en francs</lx-checkbox-label>
+                                <lx-checkbox-help ng-if="checked">Salaire en francs : {{salaireFrancs}}</lx-checkbox-help>
+                            </lx-checkbox>
+                        </div>
+                    </div>
+                    <lx-text-field lx-label="Imposition">
+                        <input ng-keyup="calcSalaire()" ng-model="impositionSlider.value" type="text" />
+                    </lx-text-field>
+                    <rzslider rz-slider-model="impositionSlider.value" rz-slider-options="impositionSlider.options"></rzslider>
+                    <lx-select lx-label="Imposition" lx-choices="vars.selectImpositions" lx-fixed-label="false" ng-change="calcSalaire()" ng-model="impositionSlider.value">
+                        <lx-select-selected>
+                            {{ $selected }}
+                        </lx-select-selected>
+
+                        <lx-select-choices>{{ $choice }}</lx-select-choices>
+
+
+                    </lx-select>
+                    <div ng-if="vars.nom.length>20">Votre nom est trop long</div>
+                    <div ng-if="salaire>1000000 && vars.nom == 'Trump'" class="alert alert-success">
+                        <strong>Success!</strong> Vous êtes président
+                    </div>
+                </div>
+                <div class="card__actions">
+                    <lx-button lx-type="flat" lx-color="orange" ng-click="modifierPrenom()">Modifier le prénom</lx-button>
+                    <lx-button lx-type="raised" class="bgc-amber-600 tc-black" ng-click="reformater()">Re-formater</lx-button>
+                    <lx-button lx-type="raised" ng-click="isShown = !isShown">Voir le détail</lx-button>
+                </div>
+            </div>
+        </div>
+        <div flex-item="4">
+            <div class="card" ng-show="isShown">
+                <div class="p+">
+                    <strong class="fs-headline display-block">{{vars.nom}} {{vars.prenom}}</strong>
+                    <ul class="list mt+">
+                        <li class="list-row">
+                            <div class="list-row__primary">
+                                <lx-icon lx-id="cash" lx-size="l" lx-color="grey" lx-type="circled"></lx-icon>
+                            </div>
+
+                            <div class="list-row__content">
+                                <span class="display-block">Salaire :</span>
+                                <span class="display-block fs-body-1 tc-black-2">{{vars.salaire}}</span>
+                            </div>
+                        </li>
+                        <li class="list-row">
+                            <div class="list-row__primary">
+                                <lx-icon lx-id="briefcase" lx-size="l" lx-color="grey" lx-type="circled"></lx-icon>
+                            </div>
+
+                            <div class="list-row__content">
+                                <span class="display-block">Salaire net :</span>
+                                <span class="display-block fs-body-1 tc-black-2">{{salaireNet}}</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+    <!-- BOOTSTRAP -->
+    <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <!-- ANGULAR -->
+    <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+    <!-- ANGULAR SLIDER -->
+    <script src="bower_components/angularjs-slider/dist/rzslider.min.js"></script>
+    <!-- MON SCRIPT -->
+    <script type="text/javascript" src="js/salary.js"></script>
+    <!-- LUMX -->
+    <script src="bower_components/velocity/velocity.js"></script>
+    <script src="bower_components/moment/min/moment-with-locales.js"></script>
+    <script src="bower_components/lumx/dist/lumx.js"></script>
+
+</body>
+
+</html>

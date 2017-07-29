@@ -1,42 +1,4 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>users management</title>
-    <!-- ANGULAR SLIDER -->
-    <link rel="stylesheet" type="text/css" href="bower_components/angularjs-slider/dist/rzslider.min.css" />
-    <!-- MON CSS -->
-    <link type="text/css" rel="stylesheet" href="dist/css/main.min.css" />
-    <!-- LUMX -->
-    <link rel="stylesheet" href="bower_components/lumx/dist/lumx.css">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-
-    <!--Import jQuery-->
-    <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
-    <!-- ANGULAR -->
-    <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
-    <!-- ANGULAR ROUTE -->
-    <script type="text/javascript" src="bower_components/angular-route/angular-route.min.js"></script>
-    <!-- ANGULAR SLIDER -->
-    <script src="bower_components/angularjs-slider/dist/rzslider.min.js"></script>
-    <!-- MON SCRIPT -->
-    <script type="text/javascript" src="js/users.js"></script>
-    <!-- LUMX -->
-    <script src="bower_components/velocity/velocity.js"></script>
-    <script src="bower_components/moment/min/moment-with-locales.js"></script>
-    <script src="bower_components/lumx/dist/lumx.js"></script>
-    <!-- ANGULAR GOOGLE MAPS -->
-    <script src="bower_components/ngmap/build/scripts/ng-map.min.js"></script>
-    <!-- GOOGLE MAPS API -->
-    <script src="http://maps.google.com/maps/api/js"></script>
-</head>
-
-<body ng-app="appUsers" class="bgc-deep-purple-800" ng-cloak>
-
-    <div ng-controller="UsersCtrl">
+<div ng-controller="UsersCtrl">
 
         <!-- <lx-tabs lx-active-tab="vm.activeTab" class="bgc-white">
             <lx-tab lx-label="Lorem Ipsum 1">
@@ -51,10 +13,8 @@
                 <p class="p+">Lorem Ipsum Content 3</p>
             </lx-tab>
         </lx-tabs> -->
-
-        <div flex-container="row" flex-align="space-around" flex-column="12" class="p+" flex-gutter="24">
-
-            <div flex-item="8">
+        <div flex-container="row" flex-column="12">
+            <div flex-item="8" class="p+">
                 <div class="card">
                     <div class="p+">
                         <strong class="fs-headline display-block">Liste des utilisateurs</strong>
@@ -64,7 +24,6 @@
                             </lx-select-selected>
                             <lx-select-choices>{{ $choice.label }}</lx-select-choices>
                         </lx-select>
-                        <!-- <p ng-if="tri">{{tri.label}}</p> -->
 
                         <rzslider rz-slider-model="howMuchToShow.value" rz-slider-options="howMuchToShow.options"></rzslider>
                         <div class="toolbar has-divider has-divider--dark">
@@ -73,8 +32,9 @@
                             </div>
                             <div class="toolbar__right">
                                 <div class="p+">
-                                    <lx-switch ng-model="onlyAdult">Voir que majeurs</lx-switch>
+                                    <lx-switch ng-model="onlyAdult" ng-click="showOnlyAdult">Voir que trentenaires</lx-switch>
                                 </div>
+                                <p>{{ onlyAdult }}</p>
 
                                 <lx-button lx-size="l" lx-color="grey" lx-type="icon" ng-if="selectedRows.length === 1">
                                     <i class="mdi mdi-pencil"></i>
@@ -112,8 +72,7 @@
                     </div>
                 </div>
             </div>
-
-            <div flex-item="4">
+            <div flex-item="4" class="p+">
                 <div class="card">
                     <form ng-submit="ajouterUser()">
                         <div class="p+">
@@ -152,13 +111,12 @@
             <!-- <div map-lazy-load="https://maps.google.com/maps/api/js">
                 <ng-map center="41,-87" zoom="3"></ng-map>
             </div> -->
-            <ng-map zoom="11" center="[40.74, -74.18]" scrollwheel="false" zoom-to-include-markers="auto">
+            <ng-map geo-fallback-center="[40.74, -74.18]" scrollwheel="false" zoom-to-include-markers="auto">
                 <marker ng-repeat="user in users" position="{{user.position}}" title="{{user.prenom}} {{user.nom}}"></marker>
+
+
+
             </ng-map>
         </div>
 
     </div>
-
-</body>
-
-</html>
